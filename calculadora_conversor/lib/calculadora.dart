@@ -1,12 +1,11 @@
+import 'package:calculadora_conversor/moedas.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'calculadora.dart';
 import 'login.dart';
-import 'inicio.dart';
-import 'sobre.dart';
-import 'editar.dart';
-import 'conversor.dart';
-
 import 'historico.dart';
+import 'contacalculadora.dart';
+
+String nomeUsuarioAtual = '';
 
 class Calculadora extends StatefulWidget {
   @override
@@ -15,9 +14,11 @@ class Calculadora extends StatefulWidget {
 
 class _CalculadoraState extends State<Calculadora> {
   String tnum1 = '', tnum2 = '', tresultado = '';
-  double num1, num2;
-  double resultado;
+  double n1 = 0, n2 = 0;
+  double res = 0;
 
+  //-------------------------------------------
+  //------------------------------------------
   Widget _body() {
     return Column(
       children: [
@@ -58,7 +59,7 @@ class _CalculadoraState extends State<Calculadora> {
                                         child: TextField(
                                           onChanged: (text) {
                                             tnum1 = text;
-                                            num1 = double.parse(tnum1);
+                                            n1 = double.parse(tnum1);
                                           },
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(),
@@ -75,7 +76,7 @@ class _CalculadoraState extends State<Calculadora> {
                                         child: TextField(
                                           onChanged: (text) {
                                             tnum2 = text;
-                                            num2 = double.parse(tnum2);
+                                            n2 = double.parse(tnum2);
                                           },
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(),
@@ -108,68 +109,120 @@ class _CalculadoraState extends State<Calculadora> {
 
                                   //Botões
                                   Row(
+                                    //(Operaçoes matematicas)
                                     children: [
+                                      //-------------------------------------
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 + num2;
+                                            res = n1 + n2;
                                             //tresultado = '$resultado';
-                                            tresultado =
-                                                resultado.toStringAsFixed(3);
-                                            resultados.add('Calculadora - $tresultado');//
+                                            tresultado = res.toStringAsFixed(3);
+                                            resultados.add(
+                                                'Calculadora - $tresultado');
+
+                                            var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contacalculadora')
+                                                .add({
+                                              'num1': n1,
+                                              'num2': n2,
+                                              'op': '+',
+                                              'resultado': res,
+                                            });
                                           });
                                         },
                                         child: Text('+'),
                                       ),
+                                      //-------------------------------------
                                       Container(
                                         width: 45,
                                       ),
+                                      //-------------------------------------
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 - num2;
+                                            res = n1 - n2;
                                             //tresultado = '$resultado';
-                                            tresultado =
-                                            resultado.toStringAsFixed(3);
-                                            resultados.add('Calculadora - $tresultado');//
+                                            tresultado = res.toStringAsFixed(3);
+                                            resultados.add(
+                                                'Calculadora - $tresultado');
+
+                                            var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contacalculadora')
+                                                .add({
+                                              'num1': n1,
+                                              'num2': n2,
+                                              'op': '-',
+                                              'resultado': res,
+                                            });
                                           });
                                         },
                                         child: Text('-'),
                                       ),
+                                      //-------------------------------------
                                       Container(
                                         width: 45,
                                       ),
+                                      //-------------------------------------
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 * num2;
+                                            res = n1 * n2;
                                             //tresultado = '$resultado';
-                                            tresultado =
-                                            resultado.toStringAsFixed(3);
-                                            resultados.add('Calculadora - $tresultado');//
+                                            tresultado = res.toStringAsFixed(3);
+                                            resultados.add(
+                                                'Calculadora - $tresultado');
+
+                                            var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contacalculadora')
+                                                .add({
+                                              'num1': n1,
+                                              'num2': n2,
+                                              'op': 'x',
+                                              'resultado': res,
+                                            });
                                           });
                                         },
                                         child: Text('x'),
                                       ),
+                                      //-------------------------------------
                                       Container(
                                         width: 45,
                                       ),
+                                      //-------------------------------------
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            if (num2 == 0) {
+                                            if (n2 == 0) {
                                               tresultado = '###';
                                             } else {
-                                              resultado = num1 / num2;
-                                              //tresultado = '$resultado';
+                                              res = n1 / n2;
+
                                               tresultado =
-                                              resultado.toStringAsFixed(3);
-                                              resultados.add('Calculadora - $tresultado');//
+                                                  res.toStringAsFixed(3);
+                                              resultados.add(
+                                                  'Calculadora - $tresultado');
+
+                                              var db =
+                                                  FirebaseFirestore.instance;
+                                              db
+                                                  .collection(
+                                                      'contacalculadora')
+                                                  .add({
+                                                'num1': n1,
+                                                'num2': n2,
+                                                'op': '/',
+                                                'resultado': res,
+                                              });
                                             }
                                           });
                                         },
                                         child: Text('/'),
                                       ),
+                                      //-------------------------------------
                                       Container(
                                         width: 45,
                                       ),
@@ -204,17 +257,17 @@ class _CalculadoraState extends State<Calculadora> {
 
   @override
   Widget build(BuildContext context) {
+    //getDocumentById(email);
     return Scaffold(
         drawer: Drawer(
           child: Column(
             children: [
               UserAccountsDrawerHeader(
                   currentAccountPicture: ClipRRect(
-                    borderRadius: BorderRadius.circular(50), //Corta imagem
-                    child: Image.asset('lib/imagens/diego.jpg'),
+                    child: CircleAvatar(),//Image.asset('lib/imagens/diego.jpg'),
                   ),
-                  accountName: Text(nomeConta),
-                  accountEmail: Text(emailConta)),
+                  accountName: Text(nmUsuarioAtual),
+                  accountEmail: Text(emailAtual)),
 
               //Item de lista de menu já pronto
               ListTile(
@@ -254,7 +307,7 @@ class _CalculadoraState extends State<Calculadora> {
                 },
               ),
 
-              ListTile(
+              /*ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.add_circle_rounded),
                 title: Text('Editar'),
@@ -262,18 +315,39 @@ class _CalculadoraState extends State<Calculadora> {
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/editar');
                 },
-              ),
+              ),*/
 
               ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.add_circle_rounded),
-                title: Text('Historico'),
+                title: Text('Historico Calculadora'),
                 subtitle: Text('resultados'),
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/historico');
                 },
-              ),/////////
+              ), /////////
 
+              ListTile(
+                //Extremidades esquerda
+                leading: Icon(Icons.add_circle_rounded),
+                title: Text('Historico Conversor'),
+                subtitle: Text('resultados'),
+                onTap: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed('/historicoconversor');
+                },
+              ), /////////
+              ListTile(
+                //Extremidades esquerda
+                leading: Icon(Icons.money),
+                title: Text('Moedas'),
+                subtitle: Text('Lista de moedas'),
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed('/listamoedas');
+                },
+              ), 
+
+//------------------------------------------------------------------------------
               ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.home),
@@ -287,7 +361,7 @@ class _CalculadoraState extends State<Calculadora> {
           ),
         ),
         appBar: AppBar(
-          title: Text("Inicio"),
+          title: Text("Calculadora"),
         ),
         body: Stack(
           //Pilha

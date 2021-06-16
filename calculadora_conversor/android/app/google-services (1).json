@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "109404950564",
+    "project_id": "calculadora-e-conversor-login",
+    "storage_bucket": "calculadora-e-conversor-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109404950564:android:f2890d68b0d802724588b1",
+        "android_client_info": {
+          "package_name": "com.example.calculadora_conversor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109404950564-3egqmv5mpui3d1j00ci3lehv9dl9inoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXWGgq3D7XhKEoN4uoyR4K4r4TrGHJO8I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109404950564-3egqmv5mpui3d1j00ci3lehv9dl9inoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

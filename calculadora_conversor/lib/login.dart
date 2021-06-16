@@ -1,15 +1,15 @@
+import 'package:calculadora_conversor/calculadora.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'calculadora.dart';
-import 'login.dart';
-import 'inicio.dart';
-import 'sobre.dart';
-import 'editar.dart';
-import 'conversor.dart';
 
-String emailAtual = 'diego.dreossi@fatec.sp.gov.br';
-String senhaAtual = '1234';
-String nomeConta = 'Diego';
-String emailConta = 'diego.dreossi@fatec.sp.gov.br';
+import 'moedas.dart';
+
+String emailAtual = '';
+String senha = '';
+String nmUsuarioAtual = '';
+//late usuarios usuarioAtual;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -17,9 +17,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String email = '';
-  String senha = '';
-  
+  bool isLoading = false;
 
   Widget _body() {
     return Column(
@@ -31,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
             //double.infinity, menos para SingleChildScrollView
             height: MediaQuery.of(context).size.height,
             //Pega informações do context
-            // double.infinity,
+
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
@@ -46,22 +44,16 @@ class _LoginPageState extends State<LoginPage> {
                       width: 400,
                       child: Text('Calculadora e Conversor',
                           style: TextStyle(fontSize: 35)),
-                      /*Image.asset('assets/imagens/bmw_m2.png'),
-                         */
                     ),
 
                     Container(
-                        height: 300,
+                        height: 280,
                         width: 300,
                         child: Image.network(
                             'https://cdn5.colorir.com/desenhos/color/201703/calculadora-solar-colegio-1332667.jpg')),
-                    /* Container(
-                      width: 30,
-                      height: 30,
-                    ),*/
 
                     SizedBox(
-                      height: 150,
+                      height: 250,
                       width: 400,
                       child: Card(
                         borderOnForeground: true,
@@ -71,9 +63,27 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               TextField(
                                 onChanged: (text) {
-                                  email = text;
+                                  nmUsuarioAtual = text;
                                 },
-                                //keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  labelText: 'Nome',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 10,
+                                    height: 5,
+                                  )
+                                ],
+                              ), 
+
+                              //-----------------
+                              TextField(
+                                onChanged: (text) {
+                                  emailAtual = text;
+                                },
                                 decoration: InputDecoration(
                                   labelText: 'EMAIL',
                                   border: OutlineInputBorder(),
@@ -105,6 +115,33 @@ class _LoginPageState extends State<LoginPage> {
                                   )
                                 ],
                               ),
+
+                               Row(
+                                children: [
+                                   Container(height: 10,width: 30,),
+                                   ElevatedButton(
+                                   onPressed: () {
+                                   if (emailAtual == "" && senha == "") {
+                                   //<-
+                                   } else {
+                                   //<-
+                                   login(emailAtual, senha);
+                                   } //<-
+                                   },
+                                   child: Text('LOGIN'),
+                                   ),
+                                   Container(height: 20, width: 150,),    
+                                   ElevatedButton(
+                                   onPressed: () {
+                                   Navigator.of(context).pushNamed('/criarconta');
+                                   },
+                                   child: Text('Criar Conta'),  
+
+                                
+                                  ),
+
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -114,22 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                     //Campos de escrever texto
 
                     //Botões
-                    ElevatedButton(
-                      onPressed: () {
-                        if (email == emailAtual &&
-                            senha == senhaAtual) {
-                          Navigator.of(context).pushNamed(
-                              '/inicio'); //Da pra voltar a pag anterior
-                          //Navigator.of(context).pushReplacementNamed('/home');
-                          //Esse substitui pagina completamente
-
-                          /*Navigator.of(context).pushReplacement( //não é possivel retornar a pagina anterior
-                              MaterialPageRoute(builder: (context) => HomePage()),//tem botao de volta a pagina anterior
-                            );*/ //Faz mudar de tela manualmente
-                        }
-                      },
-                      child: Text('LOGIN'),
-                    )
+                    
                   ],
                 ),
               ),
@@ -150,5 +172,30 @@ class _LoginPageState extends State<LoginPage> {
         _body(),
       ],
     ));
+  }
+
+  // LOGIN com Firebase Auth
+  //
+  void login(email, senha) {
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: senha)
+        .then((resultado) {
+      isLoading = false;
+      Navigator.pushReplacementNamed(context, '/inicio');
+    }).catchError((erro) {
+      var mensagem = '';
+      if (erro.code == 'user-not-found') {
+        mensagem = 'ERRO: Usuário não encontrado';
+      } else if (erro.code == 'wrong-password') {
+        mensagem = 'ERRO: Senha incorreta';
+      } else if (erro.code == 'invalid-email') {
+        mensagem = 'ERRO: Email inválido';
+      } else {
+        mensagem = erro.message;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$mensagem'), duration: Duration(seconds: 2)));
+    });
   }
 }

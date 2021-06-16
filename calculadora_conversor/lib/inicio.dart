@@ -1,12 +1,8 @@
 //Inicio
 
 import 'package:flutter/material.dart';
-import 'calculadora.dart';
 import 'login.dart';
-import 'inicio.dart';
-import 'sobre.dart';
-import 'editar.dart';
-import 'conversor.dart';
+
 
 class Inicio extends StatefulWidget {
   @override
@@ -14,11 +10,8 @@ class Inicio extends StatefulWidget {
 }
 
 class _InicioState extends State<Inicio> {
-  double num1;
-  double num2;
-  double resultado;
-  String email = '';
-  String senha = '';
+  
+ 
 
   Widget _body() {
     return Column(
@@ -136,11 +129,10 @@ class _InicioState extends State<Inicio> {
             children: [
               UserAccountsDrawerHeader(
                   currentAccountPicture: ClipRRect(
-                    borderRadius: BorderRadius.circular(50), //Corta imagem
-                    child: Image.asset('lib/imagens/diego.jpg'),
+                    child: CircleAvatar(),
                   ),
-                  accountName: Text(nomeConta),
-                  accountEmail: Text(emailConta)),
+                  accountName: Text(nmUsuarioAtual),
+                  accountEmail: Text(emailAtual)),
 
               //Item de lista de menu já pronto
               ListTile(
@@ -180,7 +172,7 @@ class _InicioState extends State<Inicio> {
                 },
               ),
 
-              ListTile(
+               /*ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.add_circle_rounded),
                 title: Text('Editar'),
@@ -188,17 +180,37 @@ class _InicioState extends State<Inicio> {
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/editar');
                 },
-              ),
+              ),*/
 
               ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.add_circle_rounded),
-                title: Text('Historico'),
+                title: Text('Historico Calculadora'),
                 subtitle: Text('resultados'),
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/historico');
                 },
-              ),
+              ), /////////
+
+              ListTile(
+                //Extremidades esquerda
+                leading: Icon(Icons.add_circle_rounded),
+                title: Text('Historico Conversor'),
+                subtitle: Text('resultados'),
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed('/historicoconversor');
+                },
+              ), 
+
+              ListTile(
+                //Extremidades esquerda
+                leading: Icon(Icons.money),
+                title: Text('Moedas'),
+                subtitle: Text('Lista de moedas'),
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed('/listamoedas');
+                },
+              ), 
 
               ListTile(
                 //Extremidades esquerda

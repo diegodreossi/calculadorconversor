@@ -1,11 +1,8 @@
+import 'package:calculadora_conversor/historicoconversor.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'calculadora.dart';
+import 'contaconversor.dart';
 import 'login.dart';
-import 'inicio.dart';
-import 'sobre.dart';
-import 'editar.dart';
-import 'conversor.dart';
-import 'historico.dart';
 
 class Conversor extends StatefulWidget {
   @override
@@ -14,10 +11,9 @@ class Conversor extends StatefulWidget {
 
 class _ConversorState extends State<Conversor> {
   String tnum1 = '', tresultado = '';
-  double num1;
-  double resultado;
-  //String tresultado = resultado.toStringAsFixed(2);
-
+  double nreal = 0;
+  double rescon = 0;
+  
   Widget _body() {
     return Column(
       children: [
@@ -58,7 +54,7 @@ class _ConversorState extends State<Conversor> {
                                         child: TextField(
                                           onChanged: (text) {
                                             tnum1 = text;
-                                            num1 = double.parse(tnum1);
+                                            nreal = double.parse(tnum1);
                                           },
                                           decoration: InputDecoration(
                                             labelText: 'Reais',
@@ -86,6 +82,7 @@ class _ConversorState extends State<Conversor> {
                                       ),
                                     ],
                                   ),
+
                                   Row(
                                     children: [
                                       Container(
@@ -100,57 +97,114 @@ class _ConversorState extends State<Conversor> {
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 / 5.35;
+                                            rescon = nreal / 5.35;
 
                                             tresultado =
-                                                resultado.toStringAsFixed(2);
+                                                rescon.toStringAsFixed(2);
+                                            resultados2
+                                                .add('Conversor - $tresultado');
+
+                                            var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contaconversor')
+                                                .add({
+                                                 'numreal':nreal,
+                                                 'moedanova':'Dolar',
+                                                 'resconvertido':rescon, 
+                                                }
+                                                );
+
+
                                           });
                                         },
                                         child: Text('Dolar'),
                                       ),
+//------------------------------------------------------------------------------
+
                                       Container(
                                         width: 45,
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 / 6.4;
+                                            rescon = nreal / 6.4;
                                             tresultado =
-                                                resultado.toStringAsFixed(2);
-                                                resultados.add('Conversor - $tresultado');
+                                                rescon.toStringAsFixed(2);
+                                            resultados2
+                                                .add('Conversor - $tresultado');
+
+
+                                            var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contaconversor')
+                                                .add({
+                                                 'numreal':nreal,
+                                                 'moedanova':'Euro',
+                                                 'resconvertido':rescon, 
+                                                }
+                                                ); 
+
                                           });
                                         },
                                         child: Text('Euro'),
                                       ),
+//------------------------------------------------------------------------------
+
                                       Container(
                                         width: 45,
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 / 304381;
+                                            rescon = nreal / 304381;
                                             tresultado =
-                                                resultado.toStringAsFixed(2);
-                                            resultados.add(
-                                                'Conversor - $tresultado');
+                                                rescon.toStringAsFixed(2);
+                                            resultados2
+                                                .add('Conversor - $tresultado');
+
+                                            var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contaconversor')
+                                                .add({
+                                                 'numreal':nreal,
+                                                 'moedanova':'Bitcoin',
+                                                 'resconvertido':rescon, 
+                                                }
+                                                );
+
                                           });
                                         },
                                         child: Text('Bitcoin'),
                                       ),
+//------------------------------------------------------------------------------
+
                                       Container(
                                         width: 45,
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
                                           setState(() {
-                                            resultado = num1 / 0.26;
+                                            rescon = nreal / 0.26;
                                             tresultado =
-                                                resultado.toStringAsFixed(2);
-                                                resultados.add('Conversor - $tresultado');
+                                                rescon.toStringAsFixed(2);
+                                            resultados2
+                                                .add('Conversor - $tresultado');
+
+                                          var db = FirebaseFirestore.instance;
+                                            db
+                                                .collection('contaconversor')
+                                                .add({
+                                                 'numreal':nreal,
+                                                 'moedanova':'Peso MX',
+                                                 'resconvertido':rescon, 
+                                                }
+                                                );
+
                                           });
                                         },
                                         child: Text('Peso MX'),
                                       ),
+//------------------------------------------------------------------------------
                                       Container(
                                         width: 45,
                                       ),
@@ -189,11 +243,10 @@ class _ConversorState extends State<Conversor> {
             children: [
               UserAccountsDrawerHeader(
                   currentAccountPicture: ClipRRect(
-                    borderRadius: BorderRadius.circular(50), //Corta imagem
-                    child: Image.asset('lib/imagens/diego.jpg'),
+                    child: CircleAvatar(),
                   ),
-                  accountName: Text(nomeConta),
-                  accountEmail: Text(emailConta)),
+                  accountName: Text(nmUsuarioAtual),
+                  accountEmail: Text(emailAtual)),
 
               //Item de lista de menu já pronto
               ListTile(
@@ -233,7 +286,7 @@ class _ConversorState extends State<Conversor> {
                 },
               ),
 
-              ListTile(
+               /*ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.add_circle_rounded),
                 title: Text('Editar'),
@@ -241,17 +294,38 @@ class _ConversorState extends State<Conversor> {
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/editar');
                 },
-              ),
+              ),*/
 
               ListTile(
                 //Extremidades esquerda
                 leading: Icon(Icons.add_circle_rounded),
-                title: Text('Historico'),
+                title: Text('Historico Calculadora'),
                 subtitle: Text('resultados'),
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/historico');
                 },
+              ), /////////
+
+              ListTile(
+                //Extremidades esquerda
+                leading: Icon(Icons.add_circle_rounded),
+                title: Text('Historico Conversor'),
+                subtitle: Text('resultados'),
+                onTap: () {
+                  Navigator.of(context)
+                      .pushReplacementNamed('/historicoconversor');
+                },
               ),
+
+              ListTile(
+                //Extremidades esquerda
+                leading: Icon(Icons.money),
+                title: Text('Moedas'),
+                subtitle: Text('Lista de moedas'),
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed('/listamoedas');
+                },
+              ), 
 
               ListTile(
                 //Extremidades esquerda
@@ -266,7 +340,7 @@ class _ConversorState extends State<Conversor> {
           ),
         ),
         appBar: AppBar(
-          title: Text("Inicio"),
+          title: Text("Conversor"),
         ),
         body: Stack(
           //Pilha

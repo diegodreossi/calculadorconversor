@@ -1,100 +1,83 @@
-//Pode ter algum problema, pode não funcionar
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'contaconversor.dart';
 import 'login.dart';
-import 'moedas.dart';
 
-class Sobre extends StatefulWidget {
+List<String> resultados2 = [];
+
+class ListaHist2 extends StatefulWidget {
+  /*String op, n1, n2;
+  bool feito;
+
+  ListaHist({this.feito,this.op, this.n1, this.n2});*/
+
   @override
-  _SobreState createState() => _SobreState();
+  _ListaHist2 createState() => _ListaHist2();
 }
 
-class _SobreState extends State<Sobre> {
-  late CollectionReference usu;
+class _ListaHist2 extends State<ListaHist2> {
+  //referencia a coleção
+  late CollectionReference contaconversor;
 
-  Widget _body() {
-    return Column(
+  @override
+  void initState() {
+    super.initState();
+    contaconversor = FirebaseFirestore.instance.collection('contaconversor');
+  }
+
+//----------------------------------------------------------------------
+//*****************************************
+  // Definir a aparência de como cada documento deve ser exibido
+  //
+  Widget exibirDocumento(item) {
+    //Converter um DOCUMENTO em um OBJETO
+    Contaconversor concon = Contaconversor.fromJson(item.data(), item.id);
+
+    return ListTile(
       
-      children: [
-        SingleChildScrollView(
-          child: SizedBox(
-            
-           
-            child: Padding(
-              padding: const EdgeInsets.only(left:8.0,right: 8),
-              child: Container(
-               
-                child: Container(
-                 
-                  
-                  child: Column(
-                    //Alinhamento
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Container(
-                         
-                          child: Text('Sobre',
-                              style: TextStyle(fontSize: 35)),
-                             
-                             
-                        ),
-  
-                        
-                      ),
-
-                      
-                      
-                      Row(children: [Container(height: 40)],),
-
-
-                      Container(
-                        height: 180,
-                        width: 400,
-                        decoration:
-                           BoxDecoration(border: Border.all(color: Colors.black)),
-
-                          child: Card(
-                          borderOnForeground: true,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                
-                               //Botões
-                        Row(
-                        children: [
-                         Text('Ola,'),
-                         Text('Meu nome e Diego Dreossi, aluno da FATEC RP.'),
-                        ],
-                        ),
-
-                        Row(children: [Text('Tenho 23 anos e moro em Ribeirão Preto, atualmente'),],),
-                        Row(children: [Text('desempregado. Este é um projeto da aula Eletiva '),],),
-                        Row(children: [Text('para dispositivos moveis.'),],),
-                        Row(children: [Text('Será um app de calculadora e conversor,'),],),
-                        Row(children: [Text('com uma lista de moedas..'),],),
-                      
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+      title: Text(
+          '${concon.numreal} reais em ${concon.moedanova} e ${concon.resconvertido}',
+          style: TextStyle(fontSize: 26)),
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () {
+          //
+          // Apagar um documento da coleção "cafes"
+          //
+          contaconversor.doc(concon.id).delete();
+        },
+      ),
     );
   }
-  
 
+//----------------------------------------------------------------------
+  /*Widget _contaHist2(BuildContext context, int indice) {
+    return Container(
+        child: ListTile(
+      leading: Icon(Icons.people),
+      title: Text(resultados2[indice]),
+    ));
+  }*/
 
-  //----------------------------------------------------------------------------
+  /*Widget _body() {
+    return Column(
+      children: <Widget>[
+        Center(
+          child: Container(
+            child: Text('Historico Conversor', style: TextStyle(fontSize: 35)),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            physics: ClampingScrollPhysics(),
+            itemBuilder: _contaHist2,
+            itemCount: resultados2.length,
+          ),
+        )
+      ],
+    );
+  }*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -200,13 +183,48 @@ class _SobreState extends State<Sobre> {
           ),
         ),
         appBar: AppBar(
-          title: Text("Inicio"),
+          title: Text("Historico do Conversor"),
         ),
-        body: Stack(
+        body:
+         
+         Stack(
           //Pilha
           children: [
-            Container(color: Colors.grey[200]),
-            _body(),
+          Container(color: Colors.grey[200]),  
+         
+
+          StreamBuilder<QuerySnapshot>(
+
+          //fonte de dados
+          stream: contaconversor.snapshots(),
+
+          //aparência
+          builder: (context, snapshot){
+
+            switch(snapshot.connectionState){
+
+              case ConnectionState.none:
+                return Center(child: Text('Erro ao conectar ao Firestore'));
+
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+
+              default:
+                //dados recebidos do Firestore
+                final dados = snapshot.requireData;
+
+                return ListView.builder(
+                  itemCount: dados.size,
+                  itemBuilder: (context,index){
+                    return exibirDocumento(dados.docs[index]);
+                  }
+                );
+            }
+          }
+        ),
+
+            
+            
           ],
         ));
   }

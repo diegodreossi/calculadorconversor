@@ -1,103 +1,70 @@
-//Pode ter algum problema, pode não funcionar
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'contacalculadora.dart';
+import 'menuhamburguer.dart';
+import 'calculadora.dart';
 import 'login.dart';
 import 'moedas.dart';
 
-class Sobre extends StatefulWidget {
+//List<String> resultados = [];
+
+class Moedas extends StatefulWidget {
   @override
-  _SobreState createState() => _SobreState();
+  _MoedasStateLista createState() => _MoedasStateLista();
 }
+//Não deu certo a exibição dos documentos do firestore
+//Nos dois historicos há algum problema
+class _MoedasStateLista extends State<Moedas> {
+  //referencia a coleção
+  late CollectionReference moedas;
 
-class _SobreState extends State<Sobre> {
-  late CollectionReference usu;
+  @override
+  void initState() {
+    super.initState();
+    moedas =
+        FirebaseFirestore.instance.collection('moedas');
+  }
 
-  Widget _body() {
-    return Column(
-      
-      children: [
-        SingleChildScrollView(
-          child: SizedBox(
-            
-           
-            child: Padding(
-              padding: const EdgeInsets.only(left:8.0,right: 8),
-              child: Container(
-               
-                child: Container(
-                 
-                  
-                  child: Column(
-                    //Alinhamento
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Container(
-                         
-                          child: Text('Sobre',
-                              style: TextStyle(fontSize: 35)),
-                             
-                             
-                        ),
-  
-                        
-                      ),
+//*****************************************
+  // Definir a aparência de como cada documento deve ser exibido
+  //
+  Widget exibirDocumento(item) {
+    //Converter um DOCUMENTO em um OBJETO
+    Moeda nmoeda = Moeda.fromJson(item.data(), item.id); //usuario do sistema
+    
 
-                      
-                      
-                      Row(children: [Container(height: 40)],),
+    
+    return ListTile(
+      title: Text(
+          '${nmoeda.nome}  -  ${nmoeda.pais}',
+          style: TextStyle(fontSize: 26)),
+      subtitle:  Text(
+          'Valor em real: ${nmoeda.valorReal}',
+          style: TextStyle(fontSize: 26)) ,  
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: (){
+          //
+          // Apagar um documento da coleção "cafes"
+          //
+          moedas.doc(nmoeda.id).delete();
+        },
+      ),
+
+      onTap: (){
+        Navigator.pushNamed(context, '/criarmoedas', arguments: nmoeda.id);
+        
+
+      },
 
 
-                      Container(
-                        height: 180,
-                        width: 400,
-                        decoration:
-                           BoxDecoration(border: Border.all(color: Colors.black)),
-
-                          child: Card(
-                          borderOnForeground: true,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                
-                               //Botões
-                        Row(
-                        children: [
-                         Text('Ola,'),
-                         Text('Meu nome e Diego Dreossi, aluno da FATEC RP.'),
-                        ],
-                        ),
-
-                        Row(children: [Text('Tenho 23 anos e moro em Ribeirão Preto, atualmente'),],),
-                        Row(children: [Text('desempregado. Este é um projeto da aula Eletiva '),],),
-                        Row(children: [Text('para dispositivos moveis.'),],),
-                        Row(children: [Text('Será um app de calculadora e conversor,'),],),
-                        Row(children: [Text('com uma lista de moedas..'),],),
-                      
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
-  
 
 
-  //----------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+  return Scaffold(
         drawer: Drawer(
           child: Column(
             children: [
@@ -200,14 +167,53 @@ class _SobreState extends State<Sobre> {
           ),
         ),
         appBar: AppBar(
-          title: Text("Inicio"),
-        ),
-        body: Stack(
-          //Pilha
-          children: [
-            Container(color: Colors.grey[200]),
-            _body(),
-          ],
-        ));
+          title: Text("Lista de Moedas"),),
+        floatingActionButton: FloatingActionButton(
+             foregroundColor: Colors.white,
+             backgroundColor: Colors.yellow,
+             child: Icon(Icons.add),
+             onPressed: (){
+             Navigator.pushNamed(context, '/criarmoedas');
+             }
+             ),
+
+        body: Container(
+            padding: EdgeInsets.all(30), 
+            child: StreamBuilder<QuerySnapshot>(
+
+          //fonte de dados
+          stream: moedas.snapshots(),
+
+          //aparência
+          builder: (context, snapshot){
+
+            switch(snapshot.connectionState){
+
+              case ConnectionState.none:
+                return Center(child: Text('Erro ao conectar ao Firestore'));
+
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+
+              default:
+                //dados recebidos do Firestore
+                final dados = snapshot.requireData;
+
+                return ListView.builder(
+                  itemCount: dados.size,
+                  itemBuilder: (context,index){
+                    return exibirDocumento(dados.docs[index]);
+                  }
+                );
+            }
+          }
+         ),
+        ),//<--
+            
+             
+            
+
+          
+        );
   }
 }
